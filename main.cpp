@@ -1,25 +1,30 @@
 #include<iostream>
 #include<vector>
 #include<string>
+#include<filesystem>
 #include"include/snake.hpp"
 #include"include/plantas.hpp"
 #include<SDL2/SDL.h>
 #include<SDL2/SDL_image.h>
 
-#define WIDTH 600
-#define HEIGHT 600
-#define BORDA 10
+//CONFIGURACOES JANELA
+int WIDTH=600;
+int HEIGHT=600;
+int BORDA=5;
 
-#define gera_aleatorio POPULACAO.emplace_back(new Snake(BORDA, BORDA, WIDTH-BORDA, HEIGHT-BORDA, BORDA))
-#define gera_planta comidas.emplace_back(new Planta(BORDA, BORDA, WIDTH-BORDA, HEIGHT-BORDA, BORDA))
-
+//SLD GLOBAIS
 SDL_Window* janela=nullptr; //cria uma variavel do tipo Window
 SDL_Renderer* renderizador=nullptr; //cria uma variavel do tipo renderizador
 
-bool SIMULANDO=true, MOSTRAR_TEMPO_SIMULACAO=false, orgulho_vivo=false, player_vivo=false;
-const int TAMANHO_POPULACAO=300, GERACAO_MAXIMA=1500;
-int STEPS=0, FPS=300, GERACAO_ATUAL=0;
-float MELHOR_SCORE=-1;
+//VARIAVEIS GLOBAIS
+bool SIMULANDO=true, TELA_CHEIA=true, orgulho_vivo=false, player_vivo=false;
+const int TAMANHO_POPULACAO=400, GERACAO_MAXIMA=2000;
+int STEPS=0, FPS=1000, GERACAO_ATUAL=0;
+float MELHOR_SCORE=-1, MUTATIONRATE=0.08;
+
+//MACROS
+#define gera_aleatorio POPULACAO.emplace_back(new Snake(BORDA, BORDA, WIDTH-BORDA, HEIGHT-BORDA, BORDA, MUTATIONRATE))
+#define gera_planta comidas.emplace_back(new Planta(BORDA, BORDA, WIDTH-BORDA, HEIGHT-BORDA, BORDA))
 
 //FUNCOES SDL
 void inicializacao_SDL();
@@ -54,7 +59,7 @@ int main(int argc, char* argv[]){
 	int fps_timer, delta_fps;
 
 	inicializacao_SDL();
-	iniciar_populacao(false);
+	iniciar_populacao(!std::filesystem::is_empty("saves/"));
 
 	while(SIMULANDO && GERACAO_ATUAL<=GERACAO_MAXIMA){
 		fps_timer=SDL_GetTicks();
@@ -66,8 +71,6 @@ int main(int argc, char* argv[]){
 		delta_fps=SDL_GetTicks()-fps_timer;
 		if(1000/FPS>delta_fps)
 			SDL_Delay(1000/FPS-delta_fps);
-		if(STEPS%FPS==0 && MOSTRAR_TEMPO_SIMULACAO)
-			std::cout<<"Tempo de Simulacao: "<<STEPS/FPS<<".0 s"<<std::endl;
 	}
 
 	encerramento_SDL();
@@ -79,7 +82,12 @@ int main(int argc, char* argv[]){
 void inicializacao_SDL(){
 	if(SDL_Init(SDL_INIT_EVERYTHING)<0)
 		std::cout<<"Erro encontrado:  "<<SDL_GetError()<<std::endl;
-	SDL_CreateWindowAndRenderer(WIDTH, HEIGHT, SDL_WINDOW_SHOWN, &janela, &renderizador);
+	if(TELA_CHEIA){
+		WIDTH=2560;
+		HEIGHT=1600;
+		SDL_CreateWindowAndRenderer(WIDTH, HEIGHT, SDL_WINDOW_FULLSCREEN_DESKTOP, &janela, &renderizador);
+	} else
+		SDL_CreateWindowAndRenderer(WIDTH, HEIGHT, SDL_WINDOW_SHOWN, &janela, &renderizador);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 	SDL_SetWindowBordered(janela, SDL_TRUE);
 	SDL_SetRenderDrawBlendMode(renderizador, SDL_BLENDMODE_BLEND);
@@ -103,7 +111,7 @@ void update(){
 	verifica_colisao_plantas();
 	verifica_colisao_cobras();
 
-	if((int)POPULACAO.size()<=0 && STEPS>0 && GERACAO_ATUAL<=GERACAO_MAXIMA)
+	if(((int)POPULACAO.size()<=0 && STEPS>0) || GERACAO_ATUAL==GERACAO_MAXIMA || STEPS>=3000)
 		reinicia_geracao();
 }
 
@@ -115,11 +123,13 @@ void input(){
 			if(evento.type == SDL_KEYDOWN){
 				switch (evento.key.keysym.sym) {
 					case SDLK_1:
-						FPS=30;
+						FPS=60;
 						break;
 					case SDLK_2:
-						FPS=300;
+						FPS=1000;
 						break;
+					case SDLK_ESCAPE:
+						SIMULANDO=false;
 					default:
 						break;
 				}
@@ -196,7 +206,8 @@ void reinicia_geracao(){
 	STEPS=0;
 	GERACAO_ATUAL++;
 	gerar_nova_populacao();
-	system("rm saves/*.txt");
+	if(!std::filesystem::is_empty("saves/"))
+		system("rm saves/*.txt");
 	salvar_tudo();
 }
 

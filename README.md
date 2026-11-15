@@ -1,81 +1,124 @@
 <div align="center">
 
-# Snake — Neural Network & Genetic Algorithm Experiment
+# Evolutionary Snake
 
-**A C++ / SDL2 game environment for experimenting with evolutionary neural-network agents.**
+**A C++ / SDL2 simulation where neural-network-controlled snakes evolve through a genetic algorithm.**
 
-![Language](https://img.shields.io/badge/language-C%2B%2B-00599C?logo=cplusplus&logoColor=white)
+![C++](https://img.shields.io/badge/C%2B%2B-00599C?logo=cplusplus&logoColor=white)
 ![Graphics](https://img.shields.io/badge/graphics-SDL2-1f6feb)
 ![AI](https://img.shields.io/badge/AI-neural%20networks%20%2B%20genetic%20algorithms-6f42c1)
-![Status](https://img.shields.io/badge/status-experiment-lightgrey)
+![Status](https://img.shields.io/badge/status-experiment-orange)
 
 </div>
 
+## Contents
+
+- [Overview](#overview)
+- [Evolution loop](#evolution-loop)
+- [Simulation configuration](#simulation-configuration)
+- [Controls](#controls)
+- [Requirements](#requirements)
+- [Build and run](#build-and-run)
+- [Saving and experiment state](#saving-and-experiment-state)
+- [Repository structure](#repository-structure)
+- [Reproducibility and limitations](#reproducibility-and-limitations)
+- [License](#license)
+
 ## Overview
 
-Snake is a C++ implementation of the classic Snake game, used as an experimental environment for a neural network combined with a genetic algorithm.
+Evolutionary Snake uses the classic Snake game as an environment for experimenting with neural networks and genetic algorithms. A population of agents moves through a rendered SDL2 arena, collects food, and is evaluated over successive generations.
 
-Rather than treating the game only as a player-controlled arcade project, the repository explores how agents can be trained through repeated simulations and evolutionary selection.
+The implementation includes custom matrix and neural-network code, Snake behavior, food entities, population management, and model persistence.
 
-The original project notes describe an experiment using 300 snakes per generation and a mutation rate of 0.8%. These are recorded experiment settings, not a standardized benchmark.
+## Evolution loop
 
-## Experiment outline
-
-1. Run a population of Snake agents in the game environment.
-2. Evaluate their behavior through the simulation.
-3. Apply the genetic-algorithm approach to produce a new population.
-4. Repeat the process across generations.
-
-Detailed fitness definitions, selection strategy, and training reproducibility should be confirmed from the source before interpreting results.
-
-## Technology stack
-
-- C++
-- SDL2
-- Artificial neural networks
-- Genetic algorithms
-
-## Repository contents
-
-```text
-.
-├── main.cpp
-├── include/
-├── model
-├── comp.sh
-├── libSDL2.so
-└── libSDL2_image.so
+```mermaid
+flowchart TD
+    A[Initialize / load population] --> B[Run agents in SDL2 arena]
+    B --> C[Update movement and food collisions]
+    C --> D[Evaluate agent scores]
+    D --> E[Select and evolve population]
+    E --> F[Save population state]
+    F --> B
 ```
+
+This diagram summarizes the evolutionary structure visible in the source; exact fitness and selection details are implemented in the C++ files.
+
+## Simulation configuration
+
+Values currently defined in `main.cpp` include:
+
+| Setting | Value |
+|---|---:|
+| Initial population size | 400 |
+| Maximum generation index | 2,000 |
+| Mutation rate | 0.08 (8%) |
+| Initial window size | 600 × 600 |
+| Fullscreen dimensions | 2,560 × 1,600 |
+| Default simulation FPS | 1,000 |
+
+These are source defaults, not performance guarantees. The actual display dimensions depend on the host system.
+
+## Controls
+
+The current input handler defines:
+
+| Key | Action |
+|---|---|
+| `1` | Set simulation FPS to 60 |
+| `2` | Set simulation FPS to 1,000 |
+| `Esc` | Exit the simulation |
+
+## Requirements
+
+- C++17-compatible compiler (the source uses `std::filesystem`)
+- SDL2
+- SDL2_image
+- Linux environment compatible with the included shell script
 
 ## Build and run
 
-### Requirements
+### Build
 
-- C++ compiler
-- SDL2 and SDL2_image runtime/development support
-- Linux environment compatible with the included script
-
-### Compile
+The included `comp.sh` compiles the application from the main source and the files under `include/`:
 
 ```bash
-chmod +x comp.sh
-./comp.sh
+g++ -std=c++17 -o model main.cpp include/matriz_lib.cpp include/rede_neural_lib.cpp include/snake.cpp include/plantas.cpp -m64 -g -Iinclude -Llib -Wall -lSDL2main -lSDL2 -lSDL2_image
 ```
-
-Review the script and shared-library requirements before running it on a different Linux distribution.
 
 ### Run
 
-Launch the executable produced by the script. The output filename and arguments are defined by `comp.sh`.
+```bash
+./model
+```
 
-## Reproducibility notes
+The script currently leaves the execution command commented out, so run the generated binary manually after a successful build.
 
-For meaningful comparisons, record the population size, mutation rate, fitness function, selection method, and random seed. The README only repeats the original experiment settings and does not claim independently reproduced performance.
+## Saving and experiment state
 
-## Project status
+The program checks the `saves/` directory to decide whether to load an existing population. **Important:** the supplied `comp.sh` removes `saves/*.txt` before compiling when the directory contains files. Back up saved models before running that script.
 
-AI/game-development experiment. Further optimization, documentation, and controlled evaluation remain possible.
+## Repository structure
+
+```text
+Snake/
+├── include/
+│   ├── matriz_lib.*
+│   ├── rede_neural_lib.*
+│   ├── snake.*
+│   └── plantas.*
+├── main.cpp
+├── model
+├── comp.sh
+└── saves/
+```
+
+## Reproducibility and limitations
+
+For comparable experiments, record the random seed, population size, mutation rate, fitness function, selection method, maximum steps, and saved model version. The values above describe the current source configuration and are not a benchmark.
+
+The repository includes SDL2 shared-library files; compatibility with other operating systems and architectures is not guaranteed.
 
 ## License
 
-No license file was identified in the repository. Contact the author before redistributing or reusing this project.
+No `LICENSE` file is currently included. Unless a license is added, reuse and redistribution permissions are not granted by this repository.

@@ -1,12 +1,32 @@
-# Snake
+# Snake — Neural Network & Genetic Algorithm Experiment
 
-Jogo Snake desenvolvido em C++ SDL2 com intuíto de se fazer um estudo e aplicação da biblioteca de Redes Neurais previamente desenvolvida em conjunto com Algorítimos Genéticos. Os resultados obtidos através do treinamento das cobrinhas(300 por populaçaão com mutation rate de 0.8%) foram satisfatórios, entretanto acredito que o projeto possua muita margem para otimização e melhoras.
+A C++ Snake game built with SDL2 as an experimental environment for combining a neural network with a genetic algorithm.
 
------------------------------------------------------------------------------//-----------------------------------------------------------------------
+## Overview
 
-Snake game developed in C++ SDL2. The goal of this project was to test my Neural Network librarie combined with Genetic Algorithms. The results obtained in the simulations(300 snakes per generation and mutation rate of 0.8%) were very good, although I believe that there are a pleny of room for improviments and otimization in the code.
+The project uses the Snake game as a test environment for an evolutionary training approach. The original project notes describe simulations with populations of 300 snakes per generation and a mutation rate of 0.8%.
 
------------------------------------------------------------------------------//-----------------------------------------------------------------------
+These values describe the experiment configuration, not a general performance benchmark.
 
-Autor(author): Eduardo Marek.
-Data(date): 01/2022.
+## Technologies and concepts
+
+- C++
+- SDL2
+- Artificial neural networks
+- Genetic algorithms
+- Evolutionary training
+
+## Repository contents
+
+- `main.cpp` — main application
+- `include/` — supporting headers
+- `comp.sh` — compilation helper script
+- `model` — model-related project file
+
+## Purpose
+
+An applied experiment in connecting game simulation, neural networks, and evolutionary optimization.
+
+## Status
+
+Research / learning prototype. There is room for further optimization and evaluation.

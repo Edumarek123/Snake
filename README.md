@@ -121,4 +121,6 @@ The repository includes SDL2 shared-library files; compatibility with other oper
 
 ## License
 
-No `LICENSE` file is currently included. Unless a license is added, reuse and redistribution permissions are not granted by this repository.
+This project is licensed under the **GNU General Public License v3.0 only (GPL-3.0-only)**. You may use, study, modify, and redistribute this project under the terms of the license.
+
+See [LICENSE](LICENSE) for the complete license text. Third-party components and assets remain subject to their own licenses and notices.
